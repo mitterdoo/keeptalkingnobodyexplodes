@@ -93,6 +93,13 @@ function ENT:Think()
 
 	self:SharedThink()
 
+	local num = self:GetTime( true )
+
+	if math.floor( num ) != self.LastTick then
+		self:EmitSound( "weapons/c4/c4_click.wav", 100, 100 )
+		self.LastTick = math.floor( num )
+	end
+
 	for i = 1, self:GetModuleCount() do
 
 		if !self.Modules[i] and self:GetNWString( i .. "__Type" ) != "" then
