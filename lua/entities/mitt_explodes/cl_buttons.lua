@@ -1,3 +1,21 @@
+/*
+
+	tl;dr?
+	all i'd really worry about is ENT:Button and ENT:CircleButton
+
+	ENT:Button( float x, float y, float w, float h, Color col, [string text], [string font], [string textCol], [int roundedCorners], [float borderSize], [Color borderColor], bool locked, bool canHold, function func, [module obj], ... )
+	ENT:CircleButton( float x, float y, float radius, [int vertices], Color col, [string text], [string font], [string textCol], [float borderSize], [Color borderColor], bool locked, bool canHold, function func, [module obj], ... )
+		text is optional
+		roundedCorners is the corner size like draw.RoundedBox, pass nothing or 0
+		canHold determines if you can hold down the button and call the press function again with an additional argument
+		func is called when the button is pressed. if holding is disabled on the button, the args are
+			function( obj, ... )
+		if it is enabled, they are
+			function( pressed, obj, ... )
+		obj is used for the 'self' argument if you're calling a function on the module defined as MOD:Function.
+
+*/
+
 local C_ORANGE = Color( 0xFF, 0x77, 0x00 )
 local C_FLASHING = Color( 255,0,0 )
 function ENT:SetupButtons()
@@ -7,6 +25,74 @@ function ENT:SetupButtons()
 	end
 	self.ButtonsSetUp = true
 	self.ButtonsPushed = false
+
+
+	function self:CircleButton( x, y, rad, vert, col, text, font, tcol, bsize, bcol, lock, canHold, func, obj, ... )
+
+		local isOn = false
+		if !lock then
+			isOn = self:MouseOn( x, y, rad )
+		end
+		if isOn then
+			self.CanHoldButton = canHold
+			self.PressedButton = func
+			self.ButtonArgsObj = obj
+			self.ButtonArgs = { ... }
+			self.OnButton = true
+
+			local outline = 2
+
+			C_ORANGE.a = 255 - ( RealTime() % 0.7 / 0.7 ) * 60
+			C_FLASHING.a = 200 + math.sin( RealTime() * math.pi * 2 * 4 ) * 50
+
+			self:Circle( x, y, rad + outline * 2, canHold and self.IsMouseDown and C_FLASHING or C_ORANGE, vert )
+
+		end
+		if isOn and mouseDown then
+			col.r = col.r * 0.9
+			col.g = col.g * 0.9
+			col.b = col.b * 0.9
+		end
+
+		self:Circle( x, y, rad, col, vert, bsize or 0, bcol or Color( 0, 0, 0 ) )
+		if text then
+			surface.SetFont( font or "default" )
+			local w2, h2 = surface.GetTextSize( text, font or "default" )
+			draw.DrawText( text, font or "default", x, y - h2 / 2, tcol or Color( 255, 255, 255 ), TEXT_ALIGN_CENTER )
+		end
+
+	end
+	function self:Button( x, y, w, h, col, text, font, tcol, corner, bsize, bcol, lock, canHold, func, obj, ... )
+
+		local isOn = false
+		if !lock then
+			isOn = self:MouseOn( x, y, w, h )
+		end
+		if isOn then
+			self.CanHoldButton = canHold
+			self.PressedButton = func
+			self.ButtonArgsObj = obj
+			self.ButtonArgs = { ... }
+			self.OnButton = true
+
+			local outline = 4
+			C_ORANGE.a = 255 - ( RealTime() % 0.7 / 0.7 ) * 60
+			C_FLASHING.a = 200 + math.sin( RealTime() * math.pi * 2 * 4 ) * 50
+			self:Box( corner or 0, x - outline, y - outline, w + outline * 2, h + outline * 2, canHold and self.IsMouseDown and C_FLASHING or C_ORANGE, nil, nil)
+
+		end
+		if isOn and mouseDown then
+			col.r = col.r * 0.9
+			col.g = col.g * 0.9
+			col.b = col.b * 0.9
+		end
+		self:Box( corner or 0, x, y, w, h, col, bsize or 0, bcol or Color( 0, 0, 0 ) )
+		if text then
+			surface.SetFont( font or "default" )
+			local w2, h2 = surface.GetTextSize( text, font or "default" )
+			draw.DrawText( text, font or "default", x + w / 2, y + h / 2 - h2 / 2, tcol or Color( 255, 255, 255 ), TEXT_ALIGN_CENTER )
+		end
+	end
 
 	function self:MouseOn( x, y, w, h )
 
@@ -76,72 +162,6 @@ function ENT:SetupButtons()
 		end
 		draw.DrawText( text, font, x, y, col, ax, ay )
 
-	end
-	function self:CircleButton( x, y, rad, vert, col, text, font, tcol, bsize, bcol, canHold, func, obj, ... )
-
-		local isOn = false
-		if !disable then
-			isOn = self:MouseOn( x, y, rad )
-		end
-		if isOn then
-			self.CanHoldButton = canHold
-			self.PressedButton = func
-			self.ButtonArgsObj = obj
-			self.ButtonArgs = { ... }
-			self.OnButton = true
-
-			local outline = 2
-
-			C_ORANGE.a = 255 - ( RealTime() % 0.7 / 0.7 ) * 60
-			C_FLASHING.a = 200 + math.sin( RealTime() * math.pi * 2 * 4 ) * 50
-
-			self:Circle( x, y, rad + outline * 2, canHold and self.IsMouseDown and C_FLASHING or C_ORANGE, vert )
-
-		end
-		if isOn and mouseDown then
-			col.r = col.r * 0.9
-			col.g = col.g * 0.9
-			col.b = col.b * 0.9
-		end
-
-		self:Circle( x, y, rad, col, vert, bsize or 0, bcol or Color( 0, 0, 0 ) )
-		if text then
-			surface.SetFont( font or "default" )
-			local w2, h2 = surface.GetTextSize( text, font or "default" )
-			draw.DrawText( text, font or "default", x, y - h2 / 2, tcol or Color( 255, 255, 255 ), TEXT_ALIGN_CENTER )
-		end
-
-	end
-	function self:Button( x, y, w, h, col, text, font, tcol, corner, bsize, bcol, canHold, func, obj, ... )
-
-		local isOn = false
-		if !disable then
-			isOn = self:MouseOn( x, y, w, h )
-		end
-		if isOn then
-			self.CanHoldButton = canHold
-			self.PressedButton = func
-			self.ButtonArgsObj = obj
-			self.ButtonArgs = { ... }
-			self.OnButton = true
-
-			local outline = 4
-			C_ORANGE.a = 255 - ( RealTime() % 0.7 / 0.7 ) * 60
-			C_FLASHING.a = 200 + math.sin( RealTime() * math.pi * 2 * 4 ) * 50
-			self:Box( corner or 0, x - outline, y - outline, w + outline * 2, h + outline * 2, canHold and self.IsMouseDown and C_FLASHING or C_ORANGE, nil, nil)
-
-		end
-		if isOn and mouseDown then
-			col.r = col.r * 0.9
-			col.g = col.g * 0.9
-			col.b = col.b * 0.9
-		end
-		self:Box( corner or 0, x, y, w, h, col, bsize or 0, bcol or Color( 0, 0, 0 ) )
-		if text then
-			surface.SetFont( font or "default" )
-			local w2, h2 = surface.GetTextSize( text, font or "default" )
-			draw.DrawText( text, font or "default", x + w / 2, y + h / 2 - h2 / 2, tcol or Color( 255, 255, 255 ), TEXT_ALIGN_CENTER )
-		end
 	end
 	function self:OnMousePressed( pressed )
 		if self.PressedButton and self.MouseModule then

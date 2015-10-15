@@ -1,9 +1,12 @@
-ENT.DecorationTables = {}
+ENT.DecorationTables = ENT.DecorationTables or {}
 local folder = "entities/mitt_explodes/decoration/"
 local files, folders = file.Find( folder .. "*.lua", "LUA" )
 print( "NobodyExplodes Loading decorations..." )
 for _, mod in ipairs( files ) do
-	_G.MOD = {}
+
+	local techName = string.gsub( mod, "%..+", "" )
+
+	_G.MOD = ENT.DecorationTables[ techName ] or {}
 	AddCSLuaFile( folder .. mod )
 	include( "sh_networking.lua" )
 	include( "decoration/" .. mod )
@@ -15,7 +18,6 @@ for _, mod in ipairs( files ) do
 		print( "> Loaded " .. mod )
 	end
 
-	local techName = string.gsub( mod, "%..+", "" )
 	_G.MOD.TechName = techName
 	ENT.DecorationTables[ techName ] = _G.MOD
 	_G.MOD = nil

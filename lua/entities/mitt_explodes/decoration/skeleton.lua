@@ -1,5 +1,6 @@
 MOD.Name			= "Skeleton"	// name of the decoration
 MOD.Enabled			= false			// should this decoration be used in game
+// MOD.Rarity		= 2				// // if MOD.Rarity exists, the bomb will call math.random( 1, Rarity ) and add the module if it returns 1
 
 /*
 	functions you can call:

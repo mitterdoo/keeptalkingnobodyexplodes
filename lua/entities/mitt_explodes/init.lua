@@ -209,7 +209,12 @@ function ENT:CreateModules()
 		i = i + 1
 		local v, k = table.Random( self.ModuleTables )
 		if k == "timer" or !v.Enabled then i = i - 1 continue end
-		self:AddModule( k )
+		
+		if v.Rarity and math.random( 1, v.Rarity ) == 1 or !v.Rarity then
+			self:AddModule( k )
+		else
+			i = i - 1
+		end
 
 	end
 
@@ -282,6 +287,8 @@ function ENT:CreateDecorations()
 
 		if v.Rarity and math.random( 1, v.Rarity ) == 1 or !v.Rarity then
 			self:AddDecoration( k )
+		else
+			i = i - 1
 		end
 
 	end

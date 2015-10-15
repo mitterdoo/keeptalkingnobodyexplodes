@@ -10,11 +10,12 @@ MOD.ForceWithTimer	= false			// if this module requires the timer in view, make 
 	functions you can call on modules:
 	MOD:GetBomb()		returns the bomb entity
 	MOD:IsTimer()		returns if the module is the timer
+	MOD:NetworkVar( string type, string name ) works exactly like ENT:NetworkVar, except there is no index 2nd argument. creates the Get and Set functions.
 
 */
 
 
-function MOD:OnStart() // called when the module is created
+function MOD:OnStart() // called when the module is created (call MOD:NetworkVar here)
 
 end
 
@@ -22,7 +23,7 @@ function MOD:Think() // called every think of the bomb entity
 
 end
 
-function MOD:OnDisarm() // called when the module is disarmed WILL NOT BE CALLED IMMEDIA
+function MOD:OnDisarm() // called when the module is disarmed. WILL NOT BE CALLED THE INSTANT IT IS DISARMED ON CLIENT
 
 end
 
