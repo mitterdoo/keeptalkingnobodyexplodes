@@ -98,24 +98,28 @@ function ENT:GetUsedModuleSpaces()
 	return used
 
 end
-function ENT:GetRandomModulePosition( forceTimer )
+function ENT:GetRandomModulePosition( forceTimer, stack )
 
+	stack = stack and stack + 1 or 1
+	if stack > 999 then
+		error( "STACK OVERFLOW" )
+	end
 	local used = self:GetUsedModuleSpaces()
-	assert( #used < 12, "max number of modules hit!" )
+	assert( table.Count(used) < 12, "max number of modules hit!" )
 
 	local frontCount = 0
 	for i = 1, 6 do
-		if table.HasValue( used, i ) then
+		if used[i] then
 			frontCount = frontCount + 1
 		end
 	end
 	local picked = math.random( frontCount < 6 and 1 or 7, frontCount < 6 and 6 or 12 )
 	if forceTimer then
 		picked = math.random( 1, 6 )
+		if frontCount == 6 then return false end
 	end
-
 	if used[picked] then
-		return self:GetRandomModulePosition( forceTimer )
+		return self:GetRandomModulePosition( forceTimer, stack)
 	else
 		return picked
 	end
@@ -134,7 +138,7 @@ end
 function ENT:GetRandomDecorPosition()
 
 	local used = self:GetUsedDecorSpaces()
-	assert( #used < 20, "max number of decorations hit!" )
+	assert( table.Count(used) < 20, "max number of decorations hit!" )
 
 	local picked
 	while true do
@@ -145,15 +149,22 @@ function ENT:GetRandomDecorPosition()
 end
 
 
-function ENT:AddModule( name )
+function ENT:AddModule( name, pos )
 
 	local modTable = self.ModuleTables[ name ]
 	assert( modTable, "module name invalid!" )
 
 	local entity = self
 	local MOD = {}
+	local oldIndex = modTable.__index
 	modTable.__index = modTable
 	setmetatable( MOD, modTable )
+	local newPos = self:GetRandomModulePosition( MOD.ForceWithTimer )
+	if !newPos then
+		MOD = nil
+		modTable.__index = oldIndex
+		return false
+	end
 
 	self.UniqueIDNum = self.UniqueIDNum + 1
 	MOD.UniqueID = self.UniqueIDNum
@@ -180,17 +191,19 @@ function ENT:AddModule( name )
 
 	MOD:NetworkVar( "Int", "Position" )
 	MOD:NetworkVar( "Bool", "Disarmed" )
-	if name == "timer" then
+	if pos then
+		MOD:SetPosition( pos )
+	elseif name == "timer" then
 		MOD:SetPosition( math.random( 1, 6 ) )
 	else
-		MOD:SetPosition( self:GetRandomModulePosition( MOD.ForceWithTimer ) )
+		MOD:SetPosition( newPos )
 	end
 	self:SetNWString( MOD.UniqueID .. "__Type", MOD.TechName )
 	self:SetModuleCount( self:GetModuleCount() + 1 )
 	self.Modules[ MOD.UniqueID ] = MOD
 
 	MOD:OnStart()
-
+	return true
 
 end
 
@@ -202,16 +215,20 @@ function ENT:CreateModules()
 	self:AddModule( "timer" )
 
 	local limit = 0
+	local rnd = 0
 	local i = 0
-	while i < 3 and limit < 999 do
+	while i < rnd and limit < 999 do
 
 		limit = limit + 1
 		i = i + 1
 		local v, k = table.Random( self.ModuleTables )
 		if k == "timer" or !v.Enabled then i = i - 1 continue end
-		
+
 		if v.Rarity and math.random( 1, v.Rarity ) == 1 or !v.Rarity then
-			self:AddModule( k )
+			local worked = self:AddModule( k )
+			if !worked then
+				i = i - 1
+			end
 		else
 			i = i - 1
 		end
@@ -278,7 +295,8 @@ function ENT:CreateDecorations()
 
 	local limit = 0
 	local i = 0
-	while i < math.random( 5,18 ) and limit < 999 do
+	local rnd = math.random( 5,18 )
+	while i < rnd and limit < 999 do
 
 		limit = limit + 1
 		i = i + 1

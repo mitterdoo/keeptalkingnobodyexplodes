@@ -159,7 +159,12 @@ end
 
 function MOD:Draw( w, h )
 
-	self:GetBomb():CircleButton( w / 8 * 3, h/2, 40, 32, self.Colors[ self:GetColor() ], self:GetText(), "Trebuchet18", self.TextColors[ self:GetColor() ], 4, nil, true, self.Press, self )
+	self:GetBomb():CircleButton( w / 8 * 3, h/2,
+		40, 32,
+		self.Colors[ self:GetColor() ],
+		self:GetText(), "Trebuchet18", self.TextColors[ self:GetColor() ],
+		4,
+		nil, false, true, self.Press, self )
 
 	local w2, h2 = 16, 60
 	local Padding = 12

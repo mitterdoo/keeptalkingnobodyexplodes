@@ -3,6 +3,7 @@ MOD.Difficulty		= 1
 MOD.Needy			= false	
 MOD.Enabled			= true
 MOD.ForceWithTimer	= false	
+MOD.Rarity			= 2
 
 print( MOD.Resources )
 MOD.Resources = MOD.Resources or {}

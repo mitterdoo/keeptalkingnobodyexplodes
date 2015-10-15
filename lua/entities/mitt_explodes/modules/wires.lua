@@ -243,7 +243,13 @@ if CLIENT then
 				surface.DrawRect( w - w2, y - 2, w2, 4 )
 			else
 
-				self:GetBomb():Button( 0, y - 2, w, 4, table.Copy( col ), nil, nil, nil, 0, nil, 0, false, self.Press, self, i )
+				self:GetBomb():Button( 0, y - 2, w, 4,
+					table.Copy( col ),
+					nil, nil, nil,
+					0,
+					nil, 0,
+					false,
+					false, self.Press, self, i )
 			end
 
 		end
