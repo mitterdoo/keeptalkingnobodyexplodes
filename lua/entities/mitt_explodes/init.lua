@@ -66,6 +66,13 @@ function ENT:Think()
 
 	self:SharedThink()
 
+	if self:GetTime(true) == 0 then
+		self:BlowUp()
+	end
+
+	self:NextThink( CurTime() + 1/32 )
+	return true
+
 end
 
 net.Receive( "ktne_network", function( len, ply )

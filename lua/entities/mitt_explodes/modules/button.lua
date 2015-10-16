@@ -185,7 +185,7 @@ function MOD:Draw( w, h )
 
 	self:GetBomb():CircleButton( w / 8 * 3, h/2,
 		40, 32,
-		self.Colors[ self:GetColor() ],
+		self.Colors[ self:GetColor() ] or Color(0,0,0),
 		self:GetText(), "Trebuchet18", self.TextColors[ self:GetColor() ],
 		4,
 		nil, false, true, self.Press, self )

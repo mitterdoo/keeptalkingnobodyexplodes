@@ -59,6 +59,19 @@ function ENT:AddModuleClient( name, id )
 		return self.TechName == "timer"
 
 	end
+
+	function MOD:Button( ... )
+		if IsValid( self:GetBomb() ) then
+			self:GetBomb():Button( ... )
+		end
+	end
+
+	function MOD:CircleButton( ... )
+		if IsValid( self:GetBomb() ) then
+			self:GetBomb():CircleButton( ... )
+		end
+	end
+
 	function MOD:SendNet( ... )
 
 		net.Start( "ktne_network" )
@@ -118,10 +131,16 @@ function ENT:Think()
 	self:SharedThink()
 
 	local num = self:GetTime( true )
+	local lastSecond = num < 1 and num > 0
 
-	if math.floor( num ) != self.LastTick then
+	if math.floor( num ) != self.LastTick and !lastSecond then
 		self:EmitSound( "weapons/c4/c4_click.wav", 100, 100 )
 		self.LastTick = math.floor( num )
+	elseif lastSecond and num % 0.18 > self.LastTick then
+		self.LastTick = num % 0.18
+		self:EmitSound( "weapons/c4/c4_click.wav", 100, 100 )
+	elseif lastSecond then
+		self.LastTick = num % 0.18
 	end
 
 	for i = 1, self:GetModuleCount() do

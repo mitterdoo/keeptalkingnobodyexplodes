@@ -24,6 +24,7 @@ SOFTWARE.
 
 MOD.Name			= "Indicator"
 MOD.Enabled			= true
+MOD.Rarity			= 2
 
 /*
 
