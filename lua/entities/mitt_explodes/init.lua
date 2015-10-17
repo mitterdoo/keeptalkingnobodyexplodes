@@ -216,7 +216,10 @@ function ENT:AddModule( name, pos )
 
 		self:SetDisarmed( true )
 		self:GetBomb():OnDisarm( self:GetPosition() )
-		self:OnDisarm()
+
+		if isfunction( self.OnDisarm ) then
+			self:OnDisarm()
+		end
 
 	end
 
@@ -233,7 +236,9 @@ function ENT:AddModule( name, pos )
 	self:SetModuleCount( self:GetModuleCount() + 1 )
 	self.Modules[ MOD.UniqueID ] = MOD
 
-	MOD:OnStart()
+	if isfunction( MOD.OnStart ) then
+		MOD:OnStart()
+	end
 	return true
 
 end
@@ -265,13 +270,17 @@ function ENT:CreateModules()
 		end
 
 	end
+	self:AddModule( "whosonfirst" )
+	self:AddModule( "simon" )
 
 end
 
 function ENT:KillModules()
 
 	for k,v in pairs( self.Modules ) do
-		v:OnEnd()
+		if isfunction( v.OnEnd ) then
+			v:OnEnd()
+		end
 		self.Modules[k] = nil
 	end
 	self:SetModuleCount( 0 )
@@ -312,7 +321,9 @@ function ENT:AddDecoration( name )
 
 	self.Decorations[ MOD.UniqueID ] = MOD
 
-	MOD:OnStart()
+	if isfunction( MOD.OnStart ) then
+		MOD:OnStart()
+	end
 
 end
 
@@ -347,7 +358,9 @@ end
 function ENT:KillDecorations()
 
 	for k,v in pairs( self.Decorations ) do
-		v:OnEnd()
+		if isfunction( v.OnEnd ) then
+			v:OnEnd()
+		end
 		self.Decorations[k] = nil
 	end
 

@@ -29,14 +29,19 @@ MOD.Enabled			= true
 MOD.ForceWithTimer	= false	
 MOD.Rarity			= 2
 
-print( MOD.Resources )
 MOD.Resources = MOD.Resources or {}
 local path = "materials/keeptalkingnobodyexplodes/keypad/"
-if !MOD.LoadedKTNEKeypadResources then
+	local files = file.Find( path .. "*-*.png", "GAME" )
 	for i = 1, 31 do
-		local files = file.Find( path .. i .. "-*", "GAME" )
-		if files[1] then
-			local fullPath = path .. files[1]
+		local file
+		for k,v in pairs( files ) do
+			if v:find( i .. "%-.+" ) then
+				file = v
+				break
+			end
+		end
+		if file then
+			local fullPath = path .. file
 
 			if SERVER then
 				MOD.Resources[ i ] = fullPath
@@ -48,9 +53,6 @@ if !MOD.LoadedKTNEKeypadResources then
 
 		end
 	end
-	MOD.LoadedKTNEKeypadResources = true
-
-end
 
 if SERVER then
 

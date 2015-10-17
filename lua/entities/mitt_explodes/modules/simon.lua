@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-MOD.Name			= "Skeleton"
+MOD.Name			= "Simon Says"
 MOD.Difficulty		= 1			
 MOD.Needy			= false		
 MOD.Enabled			= true	

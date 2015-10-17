@@ -250,7 +250,7 @@ hook.Add( "PlayerBindPress", "ktne_screen", function( ply, bind, pressed )
 
 end )
 
-function ENT:PushButtons( modPos )
+function ENT:PushButtons( mod )
 
 	if self.ButtonsPushed then
 		ErrorNoHalt( "WARNING: Buttons pushed before popped. Popping..." )
@@ -259,7 +259,8 @@ function ENT:PushButtons( modPos )
 	if !self.ButtonsSetUp then
 		error( "buttons are not set up!" )
 	end
-	self.ButtonModule = modPos
+	self.ActiveModule = mod
+	self.ButtonModule = mod:GetPosition()
 	self.ButtonsPushed = true
 	self.mx, self.my, self.mv, self.MouseModule = self:GetMouse()
 	self.OnButton = false
@@ -290,6 +291,7 @@ function ENT:PopButtons( hideCursor )
 		end
 	end
 
+	self.ActiveModule = nil
 	self.ButtonsPushed = false
 
 	self.ButtonModule = nil
@@ -325,7 +327,7 @@ end
 
 function ENT:GetCursorPos( pos, ang, eyepos, eyeang )
 
-	local size = self.ModuleSize
+	local size = self.ActiveModule and self.ActiveModule.ScreenSize or self.ModuleSize
 	local scale = self.SegmentSpacing / size
 
 	local uv = self:MouseRayInteresct( pos, ang, size, eyepos, eyeang )
@@ -349,7 +351,7 @@ function ENT:GetMouse()
 	local norm = eyepos - self:GetPos()
 	norm:Normalize()
 	local FacingFront = self:GetUp():Dot( norm ) > 0
-	local size = self.ModuleSize
+	local size = self.ActiveModule and self.ActiveModule.ScreenSize or self.ModuleSize
 	local scale = self.SegmentSpacing / size
 
 	for i = 1, 12 do

@@ -30,7 +30,6 @@ for _, mod in ipairs( files ) do
 
 	local techName = string.gsub( mod, "%..+", "" )
 
-	print( ENT.ModuleTables[ techName ] )
 	_G.MOD = ENT.ModuleTables[ techName ] or {}
 	AddCSLuaFile( folder .. mod )
 	include( "sh_networking.lua" )

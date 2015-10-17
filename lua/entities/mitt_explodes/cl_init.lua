@@ -162,7 +162,9 @@ function ENT:Think()
 			self.PressedButtons = nil
 			self.OnButton = false
 			self.ButtonArgs = nil
-			v:OnDisarmed()
+			if isfunction( v.OnDisarm ) then
+				v:OnDisarm()
+			end
 		end
 	end
 
@@ -273,7 +275,7 @@ function ENT:DrawModule( mod, x, y, visible )
 	if !mod then return end
 	local position = mod:GetPosition()
 
-	local size = self.ModuleSize
+	local size = mod.ScreenSize or self.ModuleSize
 	local scale = self.SegmentSpacing / size
 
 	local pos = self:GetModulePos( position )
@@ -369,7 +371,7 @@ function ENT:Draw()
 
 	for k, v in pairs( self.Modules ) do
 		if mod == v:GetPosition() then
-			self:PushButtons( v:GetPosition() )
+			self:PushButtons( v )
 		end
 		self:DrawModule( v, x, y, mod == v:GetPosition() )
 		if mod == v:GetPosition() then

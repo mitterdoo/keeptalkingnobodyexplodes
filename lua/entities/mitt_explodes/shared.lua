@@ -137,6 +137,7 @@ end
 function ENT:OnRemoved()
 
 	self:KillModules()
+	self:KillDecorations()
 
 end
 function ENT:SharedThink()
@@ -147,7 +148,9 @@ function ENT:SharedThink()
 	end
 	for k, v in pairs( self.Modules ) do
 
-		v:Think()
+		if isfunction( v.Think ) then
+			v:Think()
+		end
 
 	end
 	math.randomseed( tonumber( util.CRC( os.time() + CurTime() % 1 ) ) ) // for the paranoid
