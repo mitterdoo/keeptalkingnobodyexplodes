@@ -262,9 +262,13 @@ else
 	end
 	function MOD:Draw( w, h )
 
+		local size,vert = 24,4
 		local lit = self.LightTime and CurTime() - self.LightTime <= 0.5 and self:GetLitColor() or 0
-		self:CircleButton( w / 2, h / 4,
-			18, 20,
+
+		local Space = 28
+
+		self:CircleButton( w / 2, h / 2 - Space,
+			size,vert,
 			lit == 1 and self.Colors[1] or C_UNLIT[1],
 			nil,nil,nil,
 			2, color_black,
@@ -274,8 +278,8 @@ else
 			self,
 			1
 		)
-		self:CircleButton( w / 4*3, h / 2,
-			18, 20,
+		self:CircleButton( w / 2 + Space, h / 2,
+			size,vert,
 			lit == 2 and self.Colors[2] or C_UNLIT[2],
 			nil,nil,nil,
 			2, color_black,
@@ -286,8 +290,8 @@ else
 			2
 		)
 
-		self:CircleButton( w / 2, h / 4*3,
-			18, 20,
+		self:CircleButton( w / 2, h / 2 + Space,
+			size,vert,
 			lit == 3 and self.Colors[3] or C_UNLIT[3],
 			nil,nil,nil,
 			2, color_black,
@@ -297,8 +301,8 @@ else
 			self,
 			3
 		)
-		self:CircleButton( w / 4, h / 2,
-			18, 20,
+		self:CircleButton( w / 2 - Space, h / 2,
+			size,vert,
 			lit == 4 and self.Colors[4] or C_UNLIT[4],
 			nil,nil,nil,
 			2, color_black,

@@ -55,7 +55,18 @@ function ENT:SetupButtons()
 
 		local isOn = false
 		if !lock then
-			isOn = self:MouseOn( x, y, rad )
+			local poly = {}
+			local vert = vert or 16
+			table.insert( poly, { x = x, y = y, u = 0.5, v = 0.5 } )
+			for i = 0, vert do
+				local a = math.rad( ( i / vert ) * -360 )
+				table.insert( poly, { x = x + math.sin( a ) * rad, y = y + math.cos( a ) * rad, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+			end
+
+			local a = math.rad( 0 ) -- This is need for non absolute segment counts
+			table.insert( poly, { x = x + math.sin( a ) * rad, y = y + math.cos( a ) * rad, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+
+			isOn = self:MouseInPoly( poly )
 		end
 		if isOn then
 			self.CanHoldButton = canHold
@@ -134,6 +145,34 @@ function ENT:SetupButtons()
 		return mx > x and mx < x2 and my > y and my < y2
 
 	end
+
+	function self:MouseInPoly( verts, mx, my )
+
+		local mx, my, visible, mouseDown = self.mx, self.my, self.mv, LocalPlayer():KeyDown( IN_USE )
+		if self.MouseModule != self.ButtonModule then return false end
+
+		local mod = self:GetModule( self.MouseModule )
+
+		if mod and mod:GetDisarmed() then return false end
+		if !visible then return false end
+
+		local nvert = #verts
+		local j, c = nvert,false
+		for i = 1, nvert do
+			if (
+				(
+					( verts[i].y > my ) != ( verts[j].y > my)
+				) && (
+					mx < ( verts[j].x - verts[i].x ) * ( my - verts[i].y ) / ( verts[j].y - verts[i].y ) + verts[i].x )
+				) then
+				c = !c
+			end
+			j = i
+		end
+		return c
+
+	end
+
 	local function circle( x, y, radius, col, seg )
 		seg = seg or 16
 		local cir = {}
@@ -155,9 +194,9 @@ function ENT:SetupButtons()
 
 		bsize = bsize or 0
 		if bsize > 0 then
-			circle( x, y, radius - bsize, bcol or Color( 0, 0, 0 ), seg )
+			circle( x, y, radius, bcol or Color( 0, 0, 0 ), seg )
 		end
-		circle( x, y, radius, col, seg )
+		circle( x, y, radius - bsize, col, seg )
 
 	end
 	function self:Box( corner, x, y, wide, high, col, thick, bcol )

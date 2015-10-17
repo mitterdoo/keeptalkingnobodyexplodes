@@ -252,7 +252,7 @@ function ENT:CreateModules()
 
 	local limit = 0
 	local rnd = 3
-	local Diff = 1
+	local Diff = 2
 	local i = 0
 	while i < rnd and limit < 999 do
 
@@ -337,7 +337,7 @@ function ENT:CreateDecorations()
 
 	local limit = 0
 	local i = 0
-	local rnd = math.random( 5,18 )
+	local rnd = math.random( 2,18 )
 	while i < rnd and limit < 999 do
 
 		limit = limit + 1

@@ -30,6 +30,7 @@ ENT.Type 			= "anim"
 ENT.Base 			= "base_anim"
 ENT.Spawnable		= true
 ENT.AdminSpawnable  = true
+ENT.AdminOnly		= true
 ENT.PrintName		= "Keep Talking and Nobody Explodes"
 ENT.Category 		= "mitterdoo"
 ENT.Model			= "models/hunter/blocks/cube05x075x025.mdl"
