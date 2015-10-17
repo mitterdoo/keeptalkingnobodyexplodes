@@ -42,8 +42,6 @@ end
 
 function MOD:NetworkVar( vtype, name, size )
 
-	print( "CREATING NET VAR", self.TechName, vtype, name, size )
-
 	local bomb = self:GetBomb()
 
 	self.NetworkTypes[ name ] = vtype	

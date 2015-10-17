@@ -167,7 +167,7 @@ function ENT:DoesPortExist( type )
 	for k,v in pairs( self.Decorations ) do
 		if v.TechName == "port" then
 
-			if v:GetPort() == type then
+			if v.Ports[ v:GetPort() ] == type then
 				return true
 			end
 

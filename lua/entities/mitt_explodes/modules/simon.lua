@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 MOD.Name			= "Simon Says"
-MOD.Difficulty		= 1			
+MOD.Difficulty		= 2			
 MOD.Needy			= false		
 MOD.Enabled			= true	
 MOD.ForceWithTimer	= false		

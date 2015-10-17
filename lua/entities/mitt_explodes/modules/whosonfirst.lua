@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 MOD.Name			= "Who's On First"	
-MOD.Difficulty		= 1
+MOD.Difficulty		= 2
 MOD.Needy			= false
 MOD.Enabled			= true
 MOD.ForceWithTimer	= false

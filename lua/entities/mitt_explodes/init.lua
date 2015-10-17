@@ -239,7 +239,7 @@ function ENT:AddModule( name, pos )
 	if isfunction( MOD.OnStart ) then
 		MOD:OnStart()
 	end
-	return true
+	return MOD
 
 end
 
@@ -251,7 +251,8 @@ function ENT:CreateModules()
 	self:AddModule( "timer" )
 
 	local limit = 0
-	local rnd = 0
+	local rnd = 3
+	local Diff = 1
 	local i = 0
 	while i < rnd and limit < 999 do
 
@@ -260,7 +261,7 @@ function ENT:CreateModules()
 		local v, k = table.Random( self.ModuleTables )
 		if k == "timer" or !v.Enabled then i = i - 1 continue end
 
-		if v.Rarity and math.random( 1, v.Rarity ) == 1 or !v.Rarity then
+		if ( v.Rarity and math.random( 1, v.Rarity ) == 1 or !v.Rarity ) and v.Difficulty <= Diff then
 			local worked = self:AddModule( k )
 			if !worked then
 				i = i - 1
@@ -270,8 +271,6 @@ function ENT:CreateModules()
 		end
 
 	end
-	self:AddModule( "whosonfirst" )
-	self:AddModule( "simon" )
 
 end
 
@@ -324,6 +323,7 @@ function ENT:AddDecoration( name )
 	if isfunction( MOD.OnStart ) then
 		MOD:OnStart()
 	end
+	return MOD
 
 end
 
