@@ -25,6 +25,24 @@ SOFTWARE.
 include("shared.lua")
 include("cl_buttons.lua")
 
+
+surface.CreateFont( "gothic", {
+	font = "League Gothic",
+	size = 24,
+	weight = 500
+})
+surface.CreateFont( "gothic_sm", {
+	font = "League Gothic",
+	size = 16,
+	weight = 500
+})
+
+surface.CreateFont( "gothic_lg", {
+	font = "League Gothic",
+	size = 32,
+	weight = 500
+})
+
 function ENT:Initialize()
 
 	self.Modules = {}

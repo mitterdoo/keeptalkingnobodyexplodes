@@ -110,7 +110,7 @@ function ENT:SetupButtons()
 			self.ButtonArgs = { ... }
 			self.OnButton = true
 
-			local outline = 4
+			local outline = self.ActiveModule and self.ActiveModule.HoverOutline or 4
 			C_ORANGE.a = 255 - ( RealTime() % 0.7 / 0.7 ) * 60
 			C_FLASHING.a = 200 + math.sin( RealTime() * math.pi * 2 * 4 ) * 50
 			self:Box( corner or 0, x - outline, y - outline, w + outline * 2, h + outline * 2, canHold and self.IsMouseDown and C_FLASHING or C_ORANGE, nil, nil)

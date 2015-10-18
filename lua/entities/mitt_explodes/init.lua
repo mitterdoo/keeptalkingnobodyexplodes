@@ -251,7 +251,7 @@ function ENT:CreateModules()
 	self:AddModule( "timer" )
 
 	local limit = 0
-	local rnd = 3
+	local rnd = 6
 	local Diff = 2
 	local i = 0
 	while i < rnd and limit < 999 do

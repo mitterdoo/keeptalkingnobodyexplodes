@@ -85,7 +85,7 @@ local C_BG = Color( 50,50,50 )
 function MOD:Draw( w, h )
 
 	local port = self:GetPort()
-	local w2, h2 = self.Widths[ port ], 100
+	local w2, h2 = self.Widths[ port ] or 100, 100
 	w2 = w2 * 0.3
 	h2 = h2 * 0.3
 	draw.RoundedBox( 4, w / 2 - w2 / 2 - pw, h / 2 - h2 / 2 - ph, w2 + pw*2, h2 + ph*2, C_BG )

@@ -351,7 +351,7 @@ else
 
 	local StageW = 24*2
 	local StageH = 80*2
-	local Padding = 8
+	local Padding = 16
 	local C_GREEN = Color( 0,255,0 )
 	local C_BG = Color( 255, 245, 150 )
 
@@ -401,7 +401,7 @@ else
 			local oy = CenterY + ( math.ceil( i/2 ) - 2 ) * 40
 			self:Button( ox - bw/2, oy - bh/2, bw, bh,
 				C_BG,
-				self:GetButton( i, true ), "Trebuchet18", color_black,
+				self:GetButton( i, true ), "gothic", color_black,
 				4,
 				nil,nil,
 				false,false,

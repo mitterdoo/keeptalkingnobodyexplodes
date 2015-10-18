@@ -117,7 +117,7 @@ function MOD:Draw( w, h )
 	draw.RoundedBox( 0, w/2 + w2/2 - w3 - Padding, h/2 - h3/2, w3, h3, C_BG )
 
 	local x, y = w/2 + w2/2 - Padding - w3/2, h/2
-	draw.SimpleText( self:GetLabel(), "Trebuchet18", x, y, Color( 255,255,255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+	draw.SimpleText( self:GetLabel(), "gothic", x, y, Color( 255,255,255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
 	local space = w2 - w3
 
