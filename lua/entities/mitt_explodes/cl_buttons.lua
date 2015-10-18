@@ -385,6 +385,7 @@ end
 
 function ENT:GetMouse()
 
+	if self:GetPaused() and !self.DEBUG then return 0,0,false,0 end
 	local eyepos = EyePos()
 	local eyeang = EyeAngles():Forward()
 	local norm = eyepos - self:GetPos()

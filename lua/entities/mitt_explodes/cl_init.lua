@@ -333,7 +333,12 @@ function ENT:DrawModule( mod, x, y, visible )
 
 		render.SetStencilCompareFunction( STENCIL_EQUAL )
 
-		mod:Draw( size, size, x, y, visible )
+		local ok,err = xpcall( function()
+			mod:Draw( size, size, x, y, visible )
+		end, function( err )
+			print( "ERROR: " .. err )
+			print( debug.traceback() .. "\n\n" )
+		end )
 
 		render.SetStencilEnable(false)
 

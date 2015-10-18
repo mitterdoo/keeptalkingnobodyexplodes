@@ -69,6 +69,10 @@ function ENT:Think()
 	if self:GetTime(true) == 0 then
 		self:BlowUp()
 	end
+	if CurTime() - self:GetCreationTime() >= 2 and !self.StartedTimer then
+		self.StartedTimer = true
+		self:StartTimer()
+	end
 
 	self:NextThink( CurTime() + 1/32 )
 	return true
@@ -80,6 +84,7 @@ net.Receive( "ktne_network", function( len, ply )
 	// PLAYER CHECK
 	local ent = net.ReadEntity()
 	if !IsValid( ent ) or ent:GetClass() != "mitt_explodes" then return end
+	if ent:GetPaused() and !ent.DEBUG then return end
 	local id = net.ReadInt( 32 )
 	if !ent:GetModuleByID( id ) then return end
 	if !ent:GetModuleByID( id ).GetNet then return end
@@ -249,10 +254,12 @@ function ENT:CreateModules()
 	self.Modules = {}
 
 	self:AddModule( "timer" )
+	self:AddModule( "complicated" )
+	self:AddModule( "wires" )
 
 	local limit = 0
-	local rnd = 3
-	local Diff = 2
+	local rnd = 0
+	local Diff = 3
 	local i = 0
 	while i < rnd and limit < 999 do
 

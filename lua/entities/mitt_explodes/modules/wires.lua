@@ -44,9 +44,9 @@ MOD.ColorEnums = {
 	BLACK = 5
 }
 MOD.Colors = {
-	Color( 255,0,0 ),
-	Color( 0,0,255 ),
-	Color( 255,255,0 ),
+	Color( 255,50,50 ),
+	Color( 50,50,255 ),
+	Color( 255,255,50 ),
 	Color( 255,255,255 ),
 	Color( 0,0,0 )
 }

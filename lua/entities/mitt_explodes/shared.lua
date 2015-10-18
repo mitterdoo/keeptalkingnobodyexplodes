@@ -37,6 +37,7 @@ ENT.Model			= "models/hunter/blocks/cube05x075x025.mdl"
 
 ENT.SegmentSpacing	= 11.883117675781
 ENT.ModuleSize		= 128
+ENT.DEBUG = true
 
 
 /*
@@ -98,11 +99,15 @@ function ENT:NewWaitCoroutine( identifier, func, ... )
 				loop()
 			end )
 			return
-		elseif status == "dead" and co == true and ret == nil then
+		//elseif status == "dead" and co == true and ret == nil and IsValid(self) then
+		elseif IsValid(self) then
 			self.Coroutines[ identifier ] = nil
 			-- done
-		else
-			error( "something went wrong with a coroutine" )
+		//elseif IsValid( self ) then
+		//	self.Coroutines[ identifier ] = nil
+			//error( "something went wrong with a coroutine" )
+		//else
+			// don't continue anymore
 		end
 		
 	end
@@ -125,7 +130,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Float",	2, "MaxTime")
 	self:NetworkVar( "Float",	3, "PausedTime" )
 	self:NetworkVar( "Float",	4, "LastStrike" )
-	self:NetworkVar( "Float",	4, "DefuseTime" )
+	self:NetworkVar( "Float",	5, "DefuseTime" )
 
 end
 
