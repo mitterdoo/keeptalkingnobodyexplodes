@@ -22,41 +22,298 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-MOD.Name			= "Morse Code"	// name of the module
-MOD.Difficulty		= 1				// difficulty of the module
-MOD.Needy			= false			// is a needy module
-MOD.Enabled			= false			// should this module be used in game
-MOD.ForceWithTimer	= false			// if this module requires the timer in view, make this true (e.g. button)
+MOD.Name			= "Morse Code"
+MOD.Difficulty		= 3	
+MOD.Needy			= false
+MOD.Enabled			= true
+MOD.ForceWithTimer	= false
+// MOD.Rarity		= 2	
+MOD.Frequencies = {
+	3.505,
+	3.515,
+	3.522,
+	3.532,
+	3.535,
+	3.542,
+	3.545,
+	3.552,
+	3.555,
+	3.565,
+	3.572,
+	3.575,
+	3.582,
+	3.592,
+	3.595,
+	3.600
+}
+MOD.TickRate = 0.2
+MOD.Buttons = {
+	LEFT = 1,
+	RIGHT = 2,
+	TRANSMIT = 3,
+}
+MOD.HoverOutline = 2
 
-/*
 
-	functions you can call on modules:
-	MOD:GetBomb()		returns the bomb entity
-	MOD:IsTimer()		returns if the module is the timer
+function MOD:OnStart()
 
-*/
-
-
-function MOD:OnStart() // called when the module is created
+	self:NetworkVar( "String", "Morse" )
+	self:NetworkVar( "Int", "Frequency" )
+	if SERVER then
+		self:StartServer()
+	else
+		self:StartClient()
+	end
 
 end
 
-function MOD:Think() // called every think of the bomb entity
+function MOD:Think()
 
 end
 
-function MOD:OnDisarm() // called when the module is disarmed
+function MOD:OnDisarm()
 
 end
 
-function MOD:OnEnd() // called when the module is removed
+function MOD:OnEnd()
 
 end
 
-function MOD:Draw( w, h )
 
-end
+if SERVER then
 
-function MOD:ScreenClicked( x, y )
+	MOD.Morse = {
+		A = '.-',
+		B = '-...',
+		C = '-.-.',
+		D = '-..',
+		E = '.',
+		F = '..-.',
+		G = '--.',
+		H = '....',
+		I = '..',
+		J = '.---',
+		K = '-.-',
+		L = '.-..',
+		M = '--',
+		N = '-.',
+		O = '---',
+		P = '.--.',
+		Q = '--.-',
+		R = '.-.',
+		S = '...',
+		T = '-',
+		U = '..-',
+		V = '...-',
+		W = '.--',
+		X = '-..-',
+		Y = '-.--',
+		Z = '--..'
+	}
+	MOD.Words = {
+		'SHELL',
+		"HALLS",
+		"SLICK",
+		"TRICK",
+		"BOXES",
+		"LEAKS",
+		"STROBE",
+		"BISTRO",
+		"FLICK",
+		"BOMBS",
+		"BREAK",
+		"BRICK",
+		"STEAK",
+		"STING",
+		"VECTOR",
+		"BEATS"
+	}
+
+	function MOD:StartServer()
+		local morse = ""
+
+		self.Word = table.Random( self.Words )
+		for i = 1, #self.Word do
+			local c = self.Word:sub( i,i )
+			morse = morse .. self.Morse[c] .. ( i < #self.Word and "/" or "" )
+		end
+		self:SetMorse( morse )
+
+	end
+
+	function MOD:GetNet(button)
+
+		if button == self.Buttons.LEFT and self:GetFrequency() > 1 then
+			self:SetFrequency( self:GetFrequency() - 1 )
+		elseif button == self.Buttons.RIGHT and self:GetFrequency() < 16 then
+			self:SetFrequency( self:GetFrequency() + 1 )
+		elseif button == self.Buttons.TRANSMIT then
+			if self:GetFrequency() == self:GetFrequencyToTransmitTo() then
+				self:Disarm()
+			else
+				self:GetBomb():Strike( self )
+			end
+		end
+
+	end
+	function MOD:GetFrequencyToTransmitTo()
+
+		return table.KeyFromValue( self.Words, self.Word )
+
+	end
+
+else
+
+
+	function MOD:StartClient()
+
+		self:GetBomb():NewWaitCoroutine( "morse", function()
+
+			local ind = 0
+			while true do
+
+				ind = ind + 1
+				local morse = self:GetMorse()
+				local tick = self.TickRate
+				if ind > #morse then
+					ind = 0
+					sleep( tick * 7 )
+				else
+					local chr = morse:sub( ind,ind )
+					if chr == "/" then
+						sleep( tick*3 )
+					elseif chr == "." then
+						self.Lit = true
+						sleep( tick )
+						self.Lit = false
+						sleep( tick )
+					elseif chr == "-" then
+						self.Lit = true
+						sleep( tick*3 )
+						self.Lit = false
+						sleep( tick )
+					end
+
+				end
+
+
+			end
+
+		end )
+
+	end
+
+	local C_LIT = Color( 255,175,0 )
+	local C_UNLIT = Color( 128, 88, 0 )
+
+	local C_GRAY = Color( 30,30,30 )
+	local C_BG = Color( 100,100,100 )
+	local C_RED = Color( 255,80,80 )
+	local C_REALRED = Color( 255,0,0 )
+	local C_BUTTONBG = Color( 255, 245, 150 )
+	local Padding = 4
+
+	function MOD:Press( button )
+		self:SendNet( button )
+	end
+
+	function MOD:Draw( w, h )
+
+		surface.SetDrawColor( color_black )
+
+		local lw, lh = 32, 16
+		surface.DrawRect( 10, 10, lw, lh )
+		surface.DrawRect( 6, 10 + lh/2 - 1, w-6, 2 )
+		surface.DrawRect( 6, 0, 2, 10 + lh/2 - 1 )
+		surface.SetDrawColor( self.Lit and C_LIT or C_UNLIT )
+		local Border = 3
+		surface.DrawRect( 10 + Border, 10 + Border, 32 - Border*2, 16 - Border*2 )
+
+		surface.SetDrawColor( C_BG )
+		local ow, oh = w, h
+		w, h = 110, 60
+		local x, y = ow/2 - w/2, 40
+		surface.DrawRect( x, y, w, h )
+
+
+		local TunerWidth = w - Padding*2
+		surface.SetDrawColor( color_black )
+		surface.DrawRect( x + Padding, y + Padding, TunerWidth, 20 )
+		surface.SetDrawColor( color_white )
+		surface.DrawRect( x + Padding + Border, y + Padding + Border, TunerWidth - Border*2, 20 - Border*2 )
+		local lineSpacing = 6
+		local times = 16
+		local lineHeight = 4
+
+		surface.SetDrawColor( C_RED )
+		for i = 1, times do
+			local offset = i - 8.5
+
+			local ox = x + w / 2 + offset * lineSpacing
+			local oy = i % 2 == 0 and y + Padding + Border or y + Padding - Border + 20 - lineHeight
+			surface.DrawRect( ox, oy, 1, lineHeight )
+
+		end
+
+		TunerWidth = 80
+		local size = TunerWidth / 17 * self:GetFrequency() - TunerWidth / 2
+		local ox = x + w / 2 + size
+		local oy = y + Padding + 20 - Border - lineHeight*2
+		surface.SetDrawColor( C_REALRED )
+		surface.DrawRect( ox - 1, oy, 2, lineHeight*2)
+
+		surface.SetDrawColor( color_black )
+		surface.DrawRect( x + w / 2 - TunerWidth / 2, y + h - 26, TunerWidth, 20 )
+		draw.SimpleText( ( self.Frequencies[ self:GetFrequency() ] or "3.555" ) .. " MHz",
+			"Trebuchet18",
+			x + w / 2, y + h - 16, C_LIT,
+			TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
+		)
+		local bw, bh = 12, 20
+		self:Button( 
+			x + 1, y + h - 26,
+			bw, bh,
+			C_GRAY,
+			"«","default", color_white,
+			2,
+			1,color_black,
+			false,false,
+			self.Press,
+			self,
+			self.Buttons.LEFT
+		)
+		self:Button( 
+			x + w - 1 - bw, y + h - 26,
+			bw, bh,
+			C_GRAY,
+			"»","default", color_white,
+			2,
+			1,color_black,
+			false,false,
+			self.Press,
+			self,
+			self.Buttons.RIGHT
+		)
+		
+
+		local bw, bh = 20, 20
+		self:Button( 
+
+			x + w/2 - bw/2, y + h + 2,
+			bw, bh,
+			C_BUTTONBG,
+			"TX",
+			"gothic_sm",
+			color_black,
+			4,
+			2, color_black,
+			false,false,
+			self.Press,
+			self,
+			self.Buttons.TRANSMIT
+
+		)
+
+	end
 
 end

@@ -58,7 +58,7 @@ ENT.ModuleSize		= 128
 	you can pass varargs into the function. very useful for the morse code module
 
 */
-function ENT:NewWaitCoroutine( func, ... )
+function ENT:NewWaitCoroutine( identifier, func, ... )
 	
 
 	local args = {...}
@@ -74,6 +74,12 @@ function ENT:NewWaitCoroutine( func, ... )
 	local sequence = coroutine.create( function()
 		func( unpack(args) )
 	end )
+	if self.Coroutines[ identifier ] then
+		coroutine.yield( self.Coroutines[ identifier] )
+		timer.Destroy( "ktne_coroutine" .. self:EntIndex() .. tostring( identifier ) )
+	end
+
+	self.Coroutines[ identifier ] = func
 		
 	
 	local loopProtect = 99999
@@ -87,12 +93,13 @@ function ENT:NewWaitCoroutine( func, ... )
 		local co, ret = coroutine.resume( sequence )
 		local status = coroutine.status( sequence )
 		if status == "suspended" and wtime and co then
-			timer.Simple( wtime, function()
+			timer.Create( "ktne_coroutine" .. self:EntIndex() .. tostring( identifier ), wtime, 1, function()
 				wtime = nil
 				loop()
 			end )
 			return
 		elseif status == "dead" and co == true and ret == nil then
+			self.Coroutines[ identifier ] = nil
 			-- done
 		else
 			error( "something went wrong with a coroutine" )
@@ -128,6 +135,7 @@ function ENT:SharedInitialize()
 
 	self.Modules = {}
 	self.Decorations = {}
+	self.Coroutines = {}
 
 	if SERVER then
 		self:CreateModules()
@@ -137,6 +145,10 @@ function ENT:SharedInitialize()
 end
 function ENT:OnRemoved()
 
+	for identifier,v in pairs( self.Coroutines ) do
+		coroutine.yield( v )
+		timer.Destroy( "ktne_coroutine" .. self:EntIndex() .. tostring( identifier ) )
+	end
 	self:KillModules()
 	self:KillDecorations()
 
