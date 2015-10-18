@@ -76,10 +76,13 @@ function ENT:NewWaitCoroutine( identifier, func, ... )
 		func( unpack(args) )
 	end )
 	if self.Coroutines[ identifier ] then
+		print( "CANCELLING EXISTING COROUTINE", identifier )
 		coroutine.yield( self.Coroutines[ identifier] )
+		print( ">CANCELLED" )
 		timer.Destroy( "ktne_coroutine" .. self:EntIndex() .. tostring( identifier ) )
 	end
 
+	print( "creating new coroutine", identifier )
 	self.Coroutines[ identifier ] = func
 		
 	

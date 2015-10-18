@@ -254,11 +254,9 @@ function ENT:CreateModules()
 	self.Modules = {}
 
 	self:AddModule( "timer" )
-	self:AddModule( "complicated" )
-	self:AddModule( "wires" )
 
 	local limit = 0
-	local rnd = 0
+	local rnd = 11
 	local Diff = 3
 	local i = 0
 	while i < rnd and limit < 999 do

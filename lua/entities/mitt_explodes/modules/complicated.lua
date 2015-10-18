@@ -172,12 +172,24 @@ if SERVER then
 		for k, ind in pairs( inds ) do
 			local LoopBreak = 0
 			local ShouldForce = math.random( 1, 6 - CuttableWires ) != 1
+			local colorsToUse = {
+				{true,false,false},
+				{true,true,false},
+				{true,false,true},
+
+				{false,true,true},
+				{false,false,true},
+				{false,true,false}
+			}
 			while true do
 				LoopBreak = LoopBreak + 1
 				if LoopBreak > 100000 then print( "OVERFLOW" ) break end
-				local Red = math.random( 0,2 ) <= 1 and self.Enums.RED or 0
-				local Blue = math.random( 0,2 ) <= 1 and self.Enums.BLUE or 0
-				local White = ( ( Red>0 or Blue>0 ) and !( Red>0 and Blue>0 ) and math.random( 0,2 ) == 1 or (Red==0 and Blue==0) ) and self.Enums.WHITE or 0
+
+				local Picked = table.Random( colorsToUse )
+
+				local Red = Picked[1] and self.Enums.RED or 0
+				local Blue = Picked[2] and self.Enums.BLUE or 0
+				local White = Picked[3] and self.Enums.WHITE or 0
 				local Star = math.random( 0,1 ) == 1 and self.Enums.STAR or 0
 				local LED = math.random( 0,1 ) == 1 and self.Enums.LED or 0
 				if !self:ShouldCutWire( Red>0,Blue>0,Star>0,LED>0 ) and ShouldForce then

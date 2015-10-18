@@ -46,7 +46,7 @@ MOD.Frequencies = {
 	3.595,
 	3.600
 }
-MOD.TickRate = 0.2
+MOD.TickRate = 0.25
 MOD.Buttons = {
 	LEFT = 1,
 	RIGHT = 2,
@@ -67,9 +67,6 @@ function MOD:OnStart()
 
 end
 
-function MOD:Think()
-
-end
 
 function MOD:OnDisarm()
 
@@ -138,6 +135,7 @@ if SERVER then
 			morse = morse .. self.Morse[c] .. ( i < #self.Word and "/" or "" )
 		end
 		self:SetMorse( morse )
+		self:SetFrequency( math.random( 1, 16 ) )
 
 	end
 
@@ -164,42 +162,56 @@ if SERVER then
 
 else
 
+	function MOD:sleep( time )
+		self.Next = CurTime() + time
+	end
 
 	function MOD:StartClient()
 
-		self:GetBomb():NewWaitCoroutine( "morse", function()
+		self.Ind = 1
 
-			local ind = 0
-			while true do
+	end
 
-				ind = ind + 1
-				local morse = self:GetMorse()
-				local tick = self.TickRate
-				if ind > #morse then
-					ind = 0
-					sleep( tick * 7 )
-				else
-					local chr = morse:sub( ind,ind )
-					if chr == "/" then
-						sleep( tick*3 )
-					elseif chr == "." then
-						self.Lit = true
-						sleep( tick )
-						self.Lit = false
-						sleep( tick )
-					elseif chr == "-" then
-						self.Lit = true
-						sleep( tick*3 )
-						self.Lit = false
-						sleep( tick )
-					end
+	function MOD:Think()
 
+		if self.Next and CurTime() < self.Next then return end
+
+		local morse = self:GetMorse()
+		local tick = self.TickRate
+		if self.Ind > #morse then
+			self.Ind = 1
+			self:sleep( tick * 7 )
+		else
+			local chr = morse:sub( self.Ind,self.Ind )
+			if chr == "/" then
+				self:sleep( tick*3 )
+				self.Ind = self.Ind + 1
+			elseif chr == "." then
+				if !self.Part then
+					self.Part = 1
+					self.Lit = true
+					self:sleep( tick )
+				elseif self.Part == 1 then
+					self.Lit = false
+					self:sleep( tick )
+					self.Part = nil
+					self.Ind = self.Ind + 1
 				end
 
-
+			elseif chr == "-" then
+				if !self.Part then
+					self.Part = 1
+					self.Lit = true
+					self:sleep( tick*3 )
+				elseif self.Part == 1 then
+					self.Lit = false
+					self:sleep( tick )
+					self.Part = nil
+					self.Ind = self.Ind + 1
+				end
 			end
 
-		end )
+		end
 
 	end
 
