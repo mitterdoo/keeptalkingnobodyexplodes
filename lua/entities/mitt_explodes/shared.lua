@@ -36,8 +36,9 @@ ENT.Category 		= "mitterdoo"
 ENT.Model			= "models/hunter/blocks/cube05x075x025.mdl"
 
 ENT.SegmentSpacing	= 11.883117675781
+ENT.SndPath			= "keeptalkingnobodyexplodes/"
 ENT.ModuleSize		= 128
-ENT.DEBUG = true
+ENT.DEBUG = false
 
 
 /*
@@ -151,14 +152,15 @@ function ENT:SharedInitialize()
 	end
 
 end
-function ENT:OnRemoved()
+function ENT:OnRemove()
 
-	for identifier,v in pairs( self.Coroutines ) do
-		coroutine.yield( v )
-		timer.Destroy( "ktne_coroutine" .. self:EntIndex() .. tostring( identifier ) )
+	if SERVER then
+		self:KillModules()
+		self:KillDecorations()
+	else
+
+		self:StopMusic()
 	end
-	self:KillModules()
-	self:KillDecorations()
 
 end
 function ENT:SharedThink()

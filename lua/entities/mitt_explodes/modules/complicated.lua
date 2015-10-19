@@ -171,7 +171,7 @@ if SERVER then
 		local CuttableWires = 0
 		for k, ind in pairs( inds ) do
 			local LoopBreak = 0
-			local ShouldForce = math.random( 1, 6 - CuttableWires ) != 1
+			local ShouldForce = math.random( 1, 6 - CuttableWires ) != 1 and CuttableWires == 0
 			local colorsToUse = {
 				{true,false,false},
 				{true,true,false},
@@ -284,7 +284,7 @@ else
 
 	function MOD:Cut( wire )
 		self:SendNet( wire )
-		return "weapons/c4/c4_plant.wav"
+		return "keeptalkingnobodyexplodes/snip.wav"
 	end
 
 	function MOD:DrawWire( x, y, wire, Red,Blue,White,Star,LED,Cut )

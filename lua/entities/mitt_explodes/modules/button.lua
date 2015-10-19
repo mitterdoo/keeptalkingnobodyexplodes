@@ -178,6 +178,7 @@ end
 function MOD:Press( pressed )
 
 	self:SendNet( pressed and 1 or 0 )
+	return "keeptalkingnobodyexplodes/bb-press-in.wav","keeptalkingnobodyexplodes/bb-press-release.wav"
 
 end
 

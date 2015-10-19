@@ -246,7 +246,7 @@ if CLIENT then
 	function MOD:Press( i )
 
 		self:SendNet( i )
-		return "weapons/c4/c4_plant.wav"
+		return "keeptalkingnobodyexplodes/snip.wav"
 
 	end
 	function MOD:Draw( w, h, mx, my, visible )

@@ -32,10 +32,16 @@ AddCSLuaFile("cl_buttons.lua")
 include("shared.lua")
 util.AddNetworkString( "ktne_network" )
 
+
+for k,v in pairs( file.Find( "sound/" .. ENT.SndPath .. "/*", "GAME" ) ) do
+	resource.AddFile( "sound/" .. ENT.SndPath .. "/" .. v )
+end
+
+
 ENT.TimerSpeeds = {
 	1,
-	0.8,
-	0.65
+	0.811,
+	0.66
 }
 function ENT:SpawnFunction(ply,tr)
 	if not tr.Hit then return end
@@ -57,10 +63,12 @@ function ENT:Initialize()
 
 	self:GenerateSerial()
 	self:SetPaused(true)
-	self:SetPausedTime( 300 )
-
+	self:SetPausedTime( 60 * 6 )
 
 end
+
+
+
 
 function ENT:Think()
 
@@ -69,12 +77,14 @@ function ENT:Think()
 	if self:GetTime(true) == 0 then
 		self:BlowUp()
 	end
-	if CurTime() - self:GetCreationTime() >= 2 and !self.StartedTimer then
+	if CurTime() - self:GetCreationTime() >= 2 and !self.StartedTimer and !self.DEBUG then
 		self.StartedTimer = true
 		self:StartTimer()
 	end
 
-	self:NextThink( CurTime() + 1/32 )
+
+
+	self:NextThink( CurTime() )
 	return true
 
 end
@@ -256,7 +266,7 @@ function ENT:CreateModules()
 	self:AddModule( "timer" )
 
 	local limit = 0
-	local rnd = 11
+	local rnd = 2
 	local Diff = 3
 	local i = 0
 	while i < rnd and limit < 999 do

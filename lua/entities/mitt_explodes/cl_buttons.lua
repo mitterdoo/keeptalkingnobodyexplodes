@@ -75,7 +75,7 @@ function ENT:SetupButtons()
 			self.ButtonArgs = { ... }
 			self.OnButton = true
 
-			local outline = 2
+			local outline = self.ActiveModule and self.ActiveModule.HoverOutline or 2
 
 			C_ORANGE.a = 255 - ( RealTime() % 0.7 / 0.7 ) * 60
 			C_FLASHING.a = 200 + math.sin( RealTime() * math.pi * 2 * 4 ) * 50
@@ -97,6 +97,75 @@ function ENT:SetupButtons()
 		end
 
 	end
+
+
+	local function normalize2D( x, y )
+		return x / math.sqrt( x^2+y^2 ), y / math.sqrt( x^2+y^2 )
+	end
+	local function drawPoly( poly, col, scale, offset )
+
+		if scale and scale != 1 or offset then
+			poly = table.Copy( poly )
+			scale = scale or 1
+			offset = offset or 0
+			local cx, cy = 0,0
+			local count = 0
+			for k,v in pairs( poly ) do
+				cx = cx + v.x
+				cy = cy + v.y
+				count = count + 1
+			end
+			cx = cx/count
+			cy = cy/count
+			for k, v in pairs( poly ) do
+				local x, y = v.x, v.y
+				local nx, ny = normalize2D( x - cx, y - cy )
+				local dist = math.Distance( x, y, cx, cy )
+				v.x = cx + nx * ( dist+offset) * scale
+				v.y = cy + ny * ( dist+offset) * scale
+			end
+
+		end
+		surface.SetDrawColor( col )
+		draw.NoTexture()
+		surface.DrawPoly( poly )
+
+	end
+
+
+	function self:PolyButton( poly, col, lock, canHold, func, obj, ... )
+
+		local isOn = false
+		if !lock then
+
+			isOn = self:MouseInPoly( poly )
+		end
+		if isOn then
+			self.CanHoldButton = canHold
+			self.PressedButton = func
+			self.ButtonArgsObj = obj
+			self.ButtonArgs = { ... }
+			self.OnButton = true
+
+			local outline = self.ActiveModule and self.ActiveModule.HoverOutline or 2
+
+			C_ORANGE.a = 255 - ( RealTime() % 0.7 / 0.7 ) * 60
+			C_FLASHING.a = 200 + math.sin( RealTime() * math.pi * 2 * 4 ) * 50
+
+			drawPoly( poly, canHold and self.IsMouseDown and C_FLASHING or C_ORANGE, 1, outline )
+			//self:Circle( x, y, rad + outline * 2, canHold and self.IsMouseDown and C_FLASHING or C_ORANGE, vert )
+
+		end
+		if isOn and mouseDown then
+			col.r = col.r * 0.9
+			col.g = col.g * 0.9
+			col.b = col.b * 0.9
+		end
+		drawPoly( poly, col )
+		//self:Circle( x, y, rad, col, vert, bsize or 0, bcol or Color( 0, 0, 0 ) )
+
+	end
+
 	function self:Button( x, y, w, h, col, text, font, tcol, corner, bsize, bcol, lock, canHold, func, obj, ... )
 
 		local isOn = false
@@ -231,9 +300,9 @@ function ENT:SetupButtons()
 			local mod = self:GetModule( self.MouseModule )
 			if !mod then return end
 			if mod:GetDisarmed() then return end
-			local sound = "weapons/c4/key_press" .. math.random( 1, 7 ) .. ".wav"
+			local sound = "keeptalkingnobodyexplodes/press-in.wav"
 
-			local override
+			local override, override2
 
 			local args = {}
 
@@ -245,14 +314,23 @@ function ENT:SetupButtons()
 			end
 			table.Add( args, self.ButtonArgs )
 
-			override = self.PressedButton( unpack( args ) )
+			override, override2 = self.PressedButton( unpack( args ) )
 
 			if !pressed then
 				self.ButtonArgs = nil
 				self.ButtonArgsObj = nil
 				self.PressedButton = nil
 				self.OnButton = false
-				self:EmitSound( "buttons/lightswitch2.wav", 100, 100 + math.random( -4, 4 ) )
+
+				sound = "keeptalkingnobodyexplodes/press-release.wav"
+				if override2 == false then
+					sound = ""
+				elseif type( override2 ) == "string" then
+					sound = override2
+				end
+				if sound != "" then
+					self:EmitSound( sound, 100, 100 + math.random( -4, 4 ) )
+				end
 				return
 			end
 			if override == false then

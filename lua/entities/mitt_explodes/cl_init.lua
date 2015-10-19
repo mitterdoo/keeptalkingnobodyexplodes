@@ -25,6 +25,12 @@ SOFTWARE.
 include("shared.lua")
 include("cl_buttons.lua")
 
+local Sting = Sound( ENT.SndPath .. "Stinger.wav" )
+ENT.Music = {}
+
+for i = 1, 8 do
+	table.insert( ENT.Music, Sound( ENT.SndPath .. "GameRoomA_" .. i .. ".mp3" ) )
+end
 
 surface.CreateFont( "gothic", {
 	font = "League Gothic",
@@ -49,6 +55,9 @@ function ENT:Initialize()
 	self.DisarmedModules = {}
 
 	self:SetupButtons()
+
+	self:PlayMusic(1)
+	self.TensionLevel = 1
 
 end
 
@@ -87,6 +96,12 @@ function ENT:AddModuleClient( name, id )
 	function MOD:CircleButton( ... )
 		if IsValid( self:GetBomb() ) then
 			self:GetBomb():CircleButton( ... )
+		end
+	end
+
+	function MOD:PolyButton( ... )
+		if IsValid( self:GetBomb() ) then
+			self:GetBomb():PolyButton( ... )
 		end
 	end
 
@@ -144,21 +159,40 @@ function ENT:AddDecorClient( name, id )
 
 end
 
+
+
+function ENT:PlayMusic( tension )
+
+	if self.CurMusic then
+		self.CurMusic:Stop()
+	end
+	self.CurMusic = CreateSound( self, self.Music[tension] )
+	self.CurMusic:Play()
+	self.MusicPlayTime = CurTime()
+
+end
+function ENT:StopMusic()
+
+	if self.CurMusic then
+		print( "stopping" )
+		self.CurMusic:Stop()
+		self.CurMusic = nil
+	end
+
+end
+
 function ENT:Think()
 
 	self:SharedThink()
 
 	local num = self:GetTime( true )
-	local lastSecond = num < 1 and num > 0
 
-	if math.floor( num ) != self.LastTick and !lastSecond then
-		self:EmitSound( "weapons/c4/c4_click.wav", 100, 100 )
+	if math.floor( num ) != self.LastTick and !self:GetPaused() then
 		self.LastTick = math.floor( num )
-	elseif lastSecond and num % 0.18 > self.LastTick then
-		self.LastTick = num % 0.18
-		self:EmitSound( "weapons/c4/c4_click.wav", 100, 100 )
-	elseif lastSecond then
-		self.LastTick = num % 0.18
+		local snd = self.SndPath .. "timer_" .. ( self:GetStrikes() + 1 ) .. ".wav"
+		self:EmitSound( snd, 100, 100 )
+	elseif self:GetPaused() then
+		self.LastTick = math.floor( num )
 	end
 
 	for i = 1, self:GetModuleCount() do
@@ -184,6 +218,30 @@ function ENT:Think()
 				v:OnDisarm()
 			end
 		end
+	end
+
+	if self:GetDefused() and !self.StoppedMusic then
+		self.StoppedMusic = true
+		self:StopMusic()
+	end
+	if CurTime() >= self:GetCurTimeAtIndicatedTime( 30 ) - 7 and CurTime() < self:GetCurTimeAtIndicatedTime( 30 ) and !self.PlayedSting then
+
+		print( "PLAYING!!!!!!" )
+		self.PlayedSting = true
+		self:EmitSound( Sting, 100, 100 )
+
+	elseif CurTime() >= self:GetCurTimeAtIndicatedTime(30) and !self.FinalMusic then
+		self.FinalMusic = true
+		self:PlayMusic(8)
+	end
+
+	if self:GetPaused() and !self:GetDefused() or CurTime() < self:GetCurTimeAtIndicatedTime( 30 ) - 7 then
+
+		if self.MusicPlayTime and CurTime() - self.MusicPlayTime >= 32 then
+			self.TensionLevel = math.min( 7, self.TensionLevel + 1 )
+			self:PlayMusic( self.TensionLevel )
+		end
+
 	end
 
 end

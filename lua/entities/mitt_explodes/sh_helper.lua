@@ -82,9 +82,9 @@ if SERVER then
 		end
 
 		self:SetLastStrike( CurTime() )
-		self:SetLastStrikeModule( mod:GetPosition() )
+		self:SetLastStrikeModule( mod and mod:GetPosition() or 0 )
 		self:SetStrikes( strikes )
-		self:EmitSound( "buttons/button10.wav", 100, 100 )
+		self:EmitSound( self.SndPath .. "strike.wav", 100, 100 )
 		self:SetTimerSpeed( strikes + 1)
 
 	end
@@ -131,9 +131,25 @@ if SERVER then
 		self:PauseTimer()
 		self:SetDefused( true )
 		self:SetDefuseTime( CurTime() )
-		self:EmitSound( "buttons/button14.wav", 100,100 )
+		self:EmitSound( self.SndPath .. "bomb_defused.wav", 100,100 )
+		timer.Simple( 1, function()
+
+			if IsValid( self ) then
+				self:EmitSound( self.SndPath .. "GameOver_Fanfare.ogg", 100, 100 )
+			end
+
+		end)
 
 	end
+
+end
+
+
+// gets the value of what CurTime() will be when the timer displays the Target time on the clock in seconds
+function ENT:GetCurTimeAtIndicatedTime( Target )
+
+	local Speed = ( self:GetEndTime() - self:GetStartTime() ) / self:GetMaxTime()
+	return self:GetEndTime() - Target * Speed
 
 end
 

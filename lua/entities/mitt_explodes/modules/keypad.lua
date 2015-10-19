@@ -35,7 +35,8 @@ local path = "materials/keeptalkingnobodyexplodes/keypad/"
 	for i = 1, 31 do
 		local file
 		for k,v in pairs( files ) do
-			if v:find( i .. "%-.+" ) then
+			local sub = i < 10 and 1 or 2
+			if v:find( i .. "%-.+" ) and v:sub( sub,sub ) == tostring( i ) then
 				file = v
 				break
 			end
