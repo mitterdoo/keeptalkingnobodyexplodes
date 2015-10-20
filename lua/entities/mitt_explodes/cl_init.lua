@@ -56,8 +56,8 @@ function ENT:Initialize()
 
 	self:SetupButtons()
 
-	self:PlayMusic(1)
 	self.TensionLevel = 1
+	self:PlayMusic(1)
 
 end
 
@@ -165,10 +165,12 @@ function ENT:PlayMusic( tension )
 
 	if self.CurMusic then
 		self.CurMusic:Stop()
+		self.CurMusic = nil
 	end
+	if self:GetDefused() then return end
 	self.CurMusic = CreateSound( self, self.Music[tension] )
 	self.CurMusic:Play()
-	self.MusicPlayTime = CurTime()
+	self.MusicPlayTime = RealTime()
 
 end
 function ENT:StopMusic()
@@ -178,6 +180,13 @@ function ENT:StopMusic()
 		self.CurMusic:Stop()
 		self.CurMusic = nil
 	end
+
+end
+function ENT:GetNextTensionLevel()
+
+	local cur = self.TensionLevel
+	local percent = 1 - math.TimeFraction( 37, self:GetDefaultTime(), self:GetTime(true) )
+	return math.max( 2, cur, math.ceil( percent * 7 ) )
 
 end
 
@@ -226,7 +235,7 @@ function ENT:Think()
 	end
 	if CurTime() >= self:GetCurTimeAtIndicatedTime( 30 ) - 7 and CurTime() < self:GetCurTimeAtIndicatedTime( 30 ) and !self.PlayedSting then
 
-		print( "PLAYING!!!!!!" )
+		print( "PLAYING STING!!!!!!" )
 		self.PlayedSting = true
 		self:EmitSound( Sting, 100, 100 )
 
@@ -237,8 +246,12 @@ function ENT:Think()
 
 	if self:GetPaused() and !self:GetDefused() or CurTime() < self:GetCurTimeAtIndicatedTime( 30 ) - 7 then
 
-		if self.MusicPlayTime and CurTime() - self.MusicPlayTime >= 32 then
-			self.TensionLevel = math.min( 7, self.TensionLevel + 1 )
+		if self.MusicPlayTime and RealTime() - self.MusicPlayTime >= 32 then
+			self.TensionLevel = math.min( 7, self:GetNextTensionLevel() )
+			if CurTime() >= self:GetCurTimeAtIndicatedTime( 37 ) - 32 then
+				self.TensionLevel = 7
+			end
+			print( "Playing music at level", self.TensionLevel )
 			self:PlayMusic( self.TensionLevel )
 		end
 
@@ -371,6 +384,7 @@ function ENT:DrawModule( mod, x, y, visible )
 		surface.DrawRect( 4, 4, size-8, size-8 )
 		*/
 
+
 		render.ClearStencil()
 		render.SetStencilEnable( true )
 
@@ -446,8 +460,6 @@ function ENT:Draw()
 
 	self:DrawModel()
 
-	debugoverlay.Axis( self:GetDecorPos( self.Decor or 1 ), self:GetDecorAngles( self.Decor or 1 ), self.SegmentSpacing/2, 0.1, false )
-
 	local x, y, visible, mod = self:GetMouse()
 
 	for k, v in pairs( self.Modules ) do
@@ -474,6 +486,60 @@ function ENT:Draw()
 
 	for k,v in pairs( self.Decorations ) do
 		self:DrawDecor( v )
+	end
+
+
+	//3.78
+	if self:GetDefused() and CurTime() - self:GetDefuseTime() >= 3.78 and ( CurTime() - self:GetDefuseTime() > 5.38 or RealTime() % 0.3 < 0.15 ) then
+
+		local Since = CurTime() - self:GetDefuseTime()
+
+		local pos = self:GetPos() + self:Forward() * ( self.SegmentSpacing/2 + 0.1 )
+		local ang = self:GetModuleAngles( 1 )
+		cam.Start3D2D( pos, ang, 0.3 )
+
+			if Since > 8 then
+
+				local w,h = self.SegmentSpacing / 0.3 * 3, self.SegmentSpacing / 0.3 * 2
+				draw.RoundedBox( 0, w/-2,h/-2,w,h,Color( 0,0,0, math.Clamp( math.TimeFraction( 8, 9, Since ),0,1) * 250 ) )
+
+				if Since > 9 then
+
+					draw.SimpleText( self:GetTime(), "DermaLarge", 0,0,Color( 255,0,0 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+					draw.SimpleText( self:GetStrikes() .. " strike" .. ( self:GetStrikes() == 1 and "" or "s" ), "ChatFont", 0,-10, Color(255,0,0 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+					draw.SimpleText( "NICE!", "DermaLarge", 0,6,Color(0,255,0), TEXT_ALIGN_CENTER )
+
+				end
+
+			end
+
+			local alpha = 255
+			if Since > 8 then
+				alpha = math.TimeFraction( 9,8,Since)*255
+			end
+
+			if alpha > 0 then
+				draw.SimpleTextOutlined( "GOOD", "DermaLarge", 0,0,Color( 0,255,0,alpha ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 2, Color(0,0,0,alpha))
+				draw.SimpleTextOutlined( "JOB!", "DermaLarge", 0,0,Color( 0,255,0,alpha ), TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, Color(0,0,0,alpha) )
+			end
+
+		cam.End3D2D()
+
+		local pos = self:GetPos() - self:Forward() * ( self.SegmentSpacing/2 + 0.1 )
+		local ang = self:GetModuleAngles( 7 )
+		cam.Start3D2D( pos, ang, Since > 8 and 0.2 or 0.3 )
+
+			local l1 = "GOOD"
+			local l2 = "JOB!"
+			if Since > 8 then
+				l1 = "SEE OTHER"
+				l2 = "SIDE"
+			end
+			draw.SimpleTextOutlined( l1, "DermaLarge", 0,0,Color( 0,255,0 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP, 2, color_black )
+			draw.SimpleTextOutlined( l2, "DermaLarge", 0,0,Color( 0,255,0 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, color_black )
+
+		cam.End3D2D()
+
 	end
 
 end

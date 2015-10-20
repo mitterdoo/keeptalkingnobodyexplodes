@@ -29,14 +29,14 @@ MOD.Enabled			= true
 MOD.ForceWithTimer	= false	
 MOD.Rarity			= 2
 
-MOD.Resources = MOD.Resources or {}
+MOD.Resources = MOD.Resources or {[0]=Material("nonexistant/texture" )}
 local path = "materials/keeptalkingnobodyexplodes/keypad/"
 	local files = file.Find( path .. "*-*.png", "GAME" )
 	for i = 1, 31 do
 		local file
 		for k,v in pairs( files ) do
 			local sub = i < 10 and 1 or 2
-			if v:find( i .. "%-.+" ) and v:sub( sub,sub ) == tostring( i ) then
+			if v:find( i .. "%-.+" ) and v:sub( 1,sub ) == tostring( i ) then
 				file = v
 				break
 			end
@@ -54,6 +54,7 @@ local path = "materials/keeptalkingnobodyexplodes/keypad/"
 
 		end
 	end
+
 
 if SERVER then
 
@@ -143,7 +144,7 @@ function MOD:GetButtons( tab )
 	local num = self:GetButtonsInternal()
 	local band = math.BinToInt( "11111" )
 	if !tab then
-		local a,b,c,d
+		local a,b,c,d = 0,0,0,0
 		
 		d = bit.band( num, band )
 		num = bit.rshift( num, 5 )

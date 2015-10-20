@@ -30,7 +30,7 @@ ENT.Type 			= "anim"
 ENT.Base 			= "base_anim"
 ENT.Spawnable		= true
 ENT.AdminSpawnable  = true
-ENT.AdminOnly		= true
+//ENT.AdminOnly		= true
 ENT.PrintName		= "Keep Talking and Nobody Explodes"
 ENT.Category 		= "mitterdoo"
 ENT.Model			= "models/hunter/blocks/cube05x075x025.mdl"
@@ -135,6 +135,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Float",	3, "PausedTime" )
 	self:NetworkVar( "Float",	4, "LastStrike" )
 	self:NetworkVar( "Float",	5, "DefuseTime" )
+	self:NetworkVar( "Float",	6, "DefaultTime")
 
 end
 

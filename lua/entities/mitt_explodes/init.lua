@@ -37,6 +37,9 @@ for k,v in pairs( file.Find( "sound/" .. ENT.SndPath .. "/*", "GAME" ) ) do
 	resource.AddFile( "sound/" .. ENT.SndPath .. "/" .. v )
 end
 
+ENT.DefaultTime = 60 * 5
+ENT.Create_Modules = 1
+ENT.Create_Difficulty = 1
 
 ENT.TimerSpeeds = {
 	1,
@@ -63,7 +66,8 @@ function ENT:Initialize()
 
 	self:GenerateSerial()
 	self:SetPaused(true)
-	self:SetPausedTime( 60 * 6 )
+	self:SetDefaultTime( self.DefaultTime )
+	self:SetPausedTime( self:GetDefaultTime() )
 
 end
 
@@ -266,8 +270,8 @@ function ENT:CreateModules()
 	self:AddModule( "timer" )
 
 	local limit = 0
-	local rnd = 2
-	local Diff = 3
+	local rnd = self.Create_Modules
+	local Diff = self.Create_Difficulty
 	local i = 0
 	while i < rnd and limit < 999 do
 

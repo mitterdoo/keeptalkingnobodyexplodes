@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 MOD.Name			= "Complicated Wires"
-MOD.Difficulty		= 1
+MOD.Difficulty		= 3
 MOD.Needy			= false
 MOD.Enabled			= true
 MOD.ForceWithTimer	= false

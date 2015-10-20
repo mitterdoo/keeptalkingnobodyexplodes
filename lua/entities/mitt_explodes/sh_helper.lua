@@ -135,7 +135,7 @@ if SERVER then
 		timer.Simple( 1, function()
 
 			if IsValid( self ) then
-				self:EmitSound( self.SndPath .. "GameOver_Fanfare.ogg", 100, 100 )
+				self:EmitSound( self.SndPath .. "GameOver_Fanfare.wav", 100, 100 )
 			end
 
 		end)
