@@ -31,6 +31,7 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("cl_buttons.lua")
 include("shared.lua")
 util.AddNetworkString( "ktne_network" )
+util.AddNetworkString( "ktne_prompt" )
 
 
 for k,v in pairs( file.Find( "sound/" .. ENT.SndPath .. "/*", "GAME" ) ) do
@@ -41,23 +42,57 @@ ENT.DefaultTime = 60 * 5
 ENT.Create_Modules = 1
 ENT.Create_Difficulty = 1
 
+
+
 ENT.TimerSpeeds = {
 	1,
 	0.811,
 	0.66
 }
-function ENT:SpawnFunction(ply,tr)
+
+local function SpawnEnt( ply, tr, time, mods, diff )
+
 	if not tr.Hit then return end
 	local pos=tr.HitPos+tr.HitNormal*16
-	local ent=ents.Create(ClassName)
+	local ent=ents.Create("mitt_explodes")
 	ent:SetPos(pos)
+	ent.DefaultTime = math.max( 30, time )
+	ent.Create_Modules = math.max( 3, mods )
+	ent.Create_Difficulty = math.max( 1, diff )
 	local ang = ent:GetAngles()
 	ang:RotateAroundAxis( ang:Right(), 90 )
 	ent:SetAngles( ang )
 	ent:Spawn()
 	ent:Activate()
-	return ent
+
+	if ply.AddCleanup then
+		ply:AddCleanup( "mitt_explodes" )
+		undo.Create( "#mitt_explodes" )
+		undo.AddEntity( ent )
+		undo.SetPlayer( ply )
+		undo.Finish()
+	end
+
 end
+
+function ENT:SpawnFunction(ply,tr)
+
+	net.Start( "ktne_prompt" )
+	net.Send( ply )
+
+end
+
+net.Receive( "ktne_prompt", function( len,ply )
+
+	local time = net.ReadUInt( 32 )
+	local mods = net.ReadUInt( 32 )
+	local diff = net.ReadUInt( 32 )
+	SpawnEnt( ply, util.TraceLine( util.GetPlayerTrace(ply) ),time, mods, diff )
+
+end )
+
+
+
 function ENT:Initialize()
 	self:SetModel( self.Model )
 	self:PhysicsInit(SOLID_VPHYSICS)

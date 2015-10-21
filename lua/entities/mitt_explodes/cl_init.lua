@@ -49,6 +49,60 @@ surface.CreateFont( "gothic_lg", {
 	weight = 500
 })
 
+
+local Prompts = {
+	{ Desc = "Enter time on timer in seconds (min 30)", Min = 30, Default = 300 },
+	{ Desc = "Enter # of mods (min 3)", Min = 3, Default = 3 },
+	{ Desc = "Enter max difficulty of modules (min 1, max 3)", Min = 1, Max = 3, Default = 1 }
+}
+local function Prompt( ind, tab )
+
+	if !tab then
+		tab = {
+			300,
+			3,
+			1
+		}
+	end
+	local prompt = Prompts[ind]
+	Derma_StringRequest(
+
+		"Keep Talking and Nobody Explodes",
+		prompt.Desc,
+		tostring( prompt.Default ),
+		function( text )
+			local num = tonumber( text ) or 0
+			if prompt.Min then
+				num = math.max( prompt.Min, num )
+			end
+			if prompt.Max then
+				num = math.min( prompt.Max, num )
+			end
+			tab[ind] = num
+			if ind == 3 then
+				net.Start( "ktne_prompt" )
+				net.WriteUInt( tab[1],32)
+				net.WriteUInt( tab[2],32)
+				net.WriteUInt( tab[3],32)
+				net.SendToServer()
+			else
+				Prompt( ind + 1, tab )
+			end
+		end,
+		nil,
+		ind == 3 and "FINISH" or "NEXT"
+
+	)
+
+end
+
+net.Receive( "ktne_prompt", function()
+
+	Prompt( 1 )
+
+end)
+
+
 function ENT:Initialize()
 
 	self.Modules = {}
@@ -387,9 +441,6 @@ function ENT:DrawModule( mod, x, y, visible )
 
 		render.ClearStencil()
 		render.SetStencilEnable( true )
-
-		render.SetStencilWriteMask( 1 )
-		render.SetStencilTestMask( 1 )
 		render.SetStencilReferenceValue( 1 )
 		render.SetStencilCompareFunction( STENCIL_ALWAYS )
 		render.SetStencilPassOperation( STENCIL_REPLACE )
@@ -490,11 +541,11 @@ function ENT:Draw()
 
 
 	//3.78
-	if self:GetDefused() and CurTime() - self:GetDefuseTime() >= 3.78 and ( CurTime() - self:GetDefuseTime() > 5.38 or RealTime() % 0.3 < 0.15 ) then
+	if self:GetDefused() and CurTime() - self:GetDefuseTime() >= 3.78 and ( CurTime() - self:GetDefuseTime() > 5.38 or ( CurTime() - self:GetDefuseTime() ) % 0.3 > 0.15 ) then
 
 		local Since = CurTime() - self:GetDefuseTime()
 
-		local pos = self:GetPos() + self:Forward() * ( self.SegmentSpacing/2 + 0.1 )
+		local pos = self:GetPos() + self:Forward() * ( self.SegmentSpacing/2 + 0.3 )
 		local ang = self:GetModuleAngles( 1 )
 		cam.Start3D2D( pos, ang, 0.3 )
 
@@ -525,7 +576,7 @@ function ENT:Draw()
 
 		cam.End3D2D()
 
-		local pos = self:GetPos() - self:Forward() * ( self.SegmentSpacing/2 + 0.1 )
+		local pos = self:GetPos() - self:Forward() * ( self.SegmentSpacing/2 + 0.3 )
 		local ang = self:GetModuleAngles( 7 )
 		cam.Start3D2D( pos, ang, Since > 8 and 0.2 or 0.3 )
 
