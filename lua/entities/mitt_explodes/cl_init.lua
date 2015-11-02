@@ -438,7 +438,7 @@ function ENT:DrawModule( mod, x, y, visible )
 		surface.DrawRect( 4, 4, size-8, size-8 )
 		*/
 
-
+		/*
 		render.ClearStencil()
 		render.SetStencilEnable( true )
 		render.SetStencilReferenceValue( 1 )
@@ -454,7 +454,7 @@ function ENT:DrawModule( mod, x, y, visible )
 		surface.DrawRect( 4, 4, size-8, size-8 )
 		render.OverrideColorWriteEnable( false, false )
 
-		render.SetStencilCompareFunction( STENCIL_EQUAL )
+		render.SetStencilCompareFunction( STENCIL_EQUAL )*/
 
 		local ok,err = xpcall( function()
 			mod:Draw( size, size, x, y, visible )
@@ -463,7 +463,7 @@ function ENT:DrawModule( mod, x, y, visible )
 			print( debug.traceback() .. "\n\n" )
 		end )
 
-		render.SetStencilEnable(false)
+		//	render.SetStencilEnable(false)
 
 		local col = c_black
 		if mod:GetDisarmed() then

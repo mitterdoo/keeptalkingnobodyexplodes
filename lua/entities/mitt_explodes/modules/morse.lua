@@ -46,7 +46,7 @@ MOD.Frequencies = {
 	3.595,
 	3.600
 }
-MOD.TickRate = 0.25
+MOD.TickRate = 0.3
 MOD.Buttons = {
 	LEFT = 1,
 	RIGHT = 2,
