@@ -230,7 +230,7 @@ end
 function ENT:StopMusic()
 
 	if self.CurMusic then
-		print( "stopping" )
+		//print( "stopping" )
 		self.CurMusic:Stop()
 		self.CurMusic = nil
 	end
@@ -289,7 +289,7 @@ function ENT:Think()
 	end
 	if CurTime() >= self:GetCurTimeAtIndicatedTime( 30 ) - 7 and CurTime() < self:GetCurTimeAtIndicatedTime( 30 ) and !self.PlayedSting then
 
-		print( "PLAYING STING!!!!!!" )
+		//print( "PLAYING STING!!!!!!" )
 		self.PlayedSting = true
 		self:EmitSound( Sting, 100, 100 )
 
@@ -305,7 +305,7 @@ function ENT:Think()
 			if CurTime() >= self:GetCurTimeAtIndicatedTime( 37 ) - 32 then
 				self.TensionLevel = 7
 			end
-			print( "Playing music at level", self.TensionLevel )
+			//print( "Playing music at level", self.TensionLevel )
 			self:PlayMusic( self.TensionLevel )
 		end
 
