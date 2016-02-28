@@ -35,7 +35,9 @@ util.AddNetworkString( "ktne_prompt" )
 
 
 for k,v in pairs( file.Find( "sound/" .. ENT.SndPath .. "/*", "GAME" ) ) do
-	resource.AddFile( "sound/" .. ENT.SndPath .. "/" .. v )
+	if not v:find"%.bz2$" then 
+		resource.AddFile( "sound/" .. ENT.SndPath .. "/" .. v )
+	end
 end
 
 ENT.DefaultTime = 60 * 5
