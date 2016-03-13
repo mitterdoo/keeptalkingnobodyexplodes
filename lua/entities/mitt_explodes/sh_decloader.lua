@@ -25,7 +25,7 @@ SOFTWARE.
 ENT.DecorationTables = ENT.DecorationTables or {}
 local folder = "entities/mitt_explodes/decoration/"
 local files, folders = file.Find( folder .. "*.lua", "LUA" )
-print( "NobodyExplodes Loading decorations..." )
+//print( "NobodyExplodes Loading decorations..." )
 for _, mod in ipairs( files ) do
 
 	local techName = string.gsub( mod, "%..+", "" )
@@ -35,15 +35,15 @@ for _, mod in ipairs( files ) do
 	include( "sh_networking.lua" )
 	include( "decoration/" .. mod )
 	if !_G.MOD.Enabled then
-		print( "> Skipping disabled decoration '" .. mod .. "'")
+		//print( "> Skipping disabled decoration '" .. mod .. "'")
 		_G.MOD = nil
 		continue
 	else
-		print( "> Loaded " .. mod )
+		//print( "> Loaded " .. mod )
 	end
 
 	_G.MOD.TechName = techName
 	ENT.DecorationTables[ techName ] = _G.MOD
 	_G.MOD = nil
 end
-print( "Finished!" )
+//print( "Finished!" )
